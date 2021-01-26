@@ -2,7 +2,7 @@
 //  main.m
 //  LinkedList
 //
-//  Created by 秦翌桐 on 2021/1/24.
+//  Created by 赵贺 on 2021/1/24.
 //
 
 #import <Foundation/Foundation.h>

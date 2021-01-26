@@ -2,7 +2,7 @@
 //  Node.h
 //  算法
 //
-//  Created by 秦翌桐 on 2021/1/22.
+//  Created by 赵贺 on 2021/1/22.
 //
 
 #import <Foundation/Foundation.h>
