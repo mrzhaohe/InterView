@@ -25,8 +25,12 @@
     return self;
 }
 
-- (int)size {
-    return self.data.count;
+- (NSUInteger)size {
+    __block NSUInteger count;
+    dispatch_sync(self.concurrentQueue, ^{
+        count = self.data.count;
+    });
+    return count;
 }
 
 - (BOOL)isEmpty {
@@ -34,19 +38,22 @@
 }
 
 - (void)push:(id)element {
-    dispatch_barrier_async(self.concurrentQueue, ^{
+    dispatch_barrier_sync(self.concurrentQueue, ^{
         if (element) {
             [self.data addObject:element];
         }
     });
 }
 
-- (void)pop {
-    dispatch_barrier_async(self.concurrentQueue, ^{
+- (id)pop {
+    __block id obj;
+    dispatch_barrier_sync(self.concurrentQueue, ^{
         if (self.data.count) {
+            obj = self.data.lastObject;
             [self.data removeLastObject];
         }
     });
+    return obj;
 }
 
 - (id)top {
@@ -61,6 +68,12 @@
     if (self.concurrentQueue) {
         self.concurrentQueue = nil;
     }
+}
+
+
+- (NSString *)description {
+    NSString *string = [NSString stringWithFormat:@"%@", self.data];
+    return string;
 }
 
 @end

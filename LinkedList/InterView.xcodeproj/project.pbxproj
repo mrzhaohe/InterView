@@ -16,6 +16,7 @@
 		86A1966325BFBF9B0017C529 /* Stack.m in Sources */ = {isa = PBXBuildFile; fileRef = 86A1966225BFBF9B0017C529 /* Stack.m */; };
 		86A1966F25BFC7D50017C529 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 86A1966E25BFC7D50017C529 /* main.m */; };
 		86A1967A25BFC7E20017C529 /* Queue.m in Sources */ = {isa = PBXBuildFile; fileRef = 86A1967925BFC7E20017C529 /* Queue.m */; };
+		86A1968225C00FC40017C529 /* Queue.m in Sources */ = {isa = PBXBuildFile; fileRef = 86A1968125C00FC40017C529 /* Queue.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -86,6 +87,8 @@
 		86A1966E25BFC7D50017C529 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		86A1967825BFC7E20017C529 /* Queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Queue.h; sourceTree = "<group>"; };
 		86A1967925BFC7E20017C529 /* Queue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Queue.m; sourceTree = "<group>"; };
+		86A1968025C00FC40017C529 /* Queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Queue.h; sourceTree = "<group>"; };
+		86A1968125C00FC40017C529 /* Queue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Queue.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +187,8 @@
 			isa = PBXGroup;
 			children = (
 				86A1965825BFBF7A0017C529 /* main.m */,
+				86A1968025C00FC40017C529 /* Queue.h */,
+				86A1968125C00FC40017C529 /* Queue.m */,
 				86A1966125BFBF9B0017C529 /* Stack.h */,
 				86A1966225BFBF9B0017C529 /* Stack.m */,
 			);
@@ -366,6 +371,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86A1968225C00FC40017C529 /* Queue.m in Sources */,
 				86A1966325BFBF9B0017C529 /* Stack.m in Sources */,
 				86A1965925BFBF7A0017C529 /* main.m in Sources */,
 			);

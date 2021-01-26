@@ -53,7 +53,6 @@
     return [self node:index].element;
 }
 
-
 - (int)indexOf:(nonnull id)element {
     Node *node = self.first;
     int index = 0;

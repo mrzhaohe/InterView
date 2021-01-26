@@ -11,14 +11,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Stack : NSObject
 
-- (int)size;
 
+/// 栈长
+- (NSUInteger)size;
+
+
+/// 是否为空
 - (BOOL)isEmpty;
 
+
+/// 入栈
+/// @param element 入栈元素
 - (void)push:(id)element;
 
-- (void)pop;
 
+/// 出栈
+- (id)pop;
+
+
+/// 栈顶
 - (id)top;
 
 @end
