@@ -1,6 +1,6 @@
 [TOC]
 
-# 面试
+# InterView
 
 ## 底层原理
 
@@ -23,6 +23,26 @@ OC的类信息存放在哪里？
 ```
 对象方法、属性、成员变量、协议信息，存放在class对象中 类方法，存放在meta-class对象中 成员变量的具体值，存放在instance对象
 ```
+
+class_rw_t 与 class_ro_t 区别
+
+```
+class_rw_t结构体内有一个指向class_ro_t结构体的指针.
+class_ro_t存放的是编译期间就确定的；而class_rw_t是在runtime时才确定，它会先将class_ro_t的内容拷贝过去，然后再将当前类的分类的这些属性、方法等拷贝到其中。所以可以说class_rw_t是class_ro_t的超集
+
+当然实际访问类的方法、属性等也都是访问的class_rw_t中的内容
+属性(property)存放在class_rw_t中，实例变量(ivar)存放在class_ro_t中。
+```
+
+msg_send
+
+```
+
+```
+
+![](https://tva1.sinaimg.cn/large/008eGmZEly1gn3kp66a7ej30hv0odq6v.jpg)
+
+![](https://tva1.sinaimg.cn/large/008eGmZEly1gn3kd0skfkj30lq0cb3z6.jpg)
 
 iOS用什么方式实现对一个对象的KVO？(KVO的本质是什么？) 
 
