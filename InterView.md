@@ -34,13 +34,49 @@ class_ro_t存放的是编译期间就确定的；而class_rw_t是在runtime时�
 属性(property)存放在class_rw_t中，实例变量(ivar)存放在class_ro_t中。
 ```
 
-msg_send
+msg_send 消息转发
 
+```objective-c
+分为三个阶段
+1、动态方法解析 
+
+  + (BOOL)resolveInstanceMethod:(SEL)sel {
+    if (sel == @selector(run)) {
+        return NO;//返回 NO， 才会执行第二步
+    }
+    return [super resolveInstanceMethod:sel];
+	}
+	
+2、快速转发 
+  
+  - (id)forwardingTargetForSelector:(SEL)aSelector {
+    if (aSelector == @selector(run)) {
+//        return  [Dog new]; //替换其他消息接受者
+        return nil; //返回nil 则会走到第3阶段，完全消息转发机制（慢速转发）
+    }
+    return  [super forwardingTargetForSelector:aSelector];
+	}
+  
+3、完全消息转发
+  
+  3.1方法签名
+  - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    if (aSelector == @selector(run)) {
+        Dog *dog = [Dog new];
+        return [dog methodSignatureForSelector:aSelector];
+    }
+    return [super methodSignatureForSelector:aSelector];
+	}
+	3.2 消息转发
+    - (void)forwardInvocation:(NSInvocation *)anInvocation {
+    Dog *dog = [Dog new];
+    if ([dog respondsToSelector:anInvocation.selector]) {
+        [anInvocation invokeWithTarget:dog];
+    } else {
+        [super forwardInvocation:anInvocation];
+    }
+	}
 ```
-
-```
-
-![](https://tva1.sinaimg.cn/large/008eGmZEly1gn3kp66a7ej30hv0odq6v.jpg)
 
 ![](https://tva1.sinaimg.cn/large/008eGmZEly1gn3kd0skfkj30lq0cb3z6.jpg)
 
@@ -65,8 +101,6 @@ SEL是在dyld加载镜像到内存时，通过_read_image方法加载到内存�
 
 
 
-##### 
-
 ## 其他原理
 
 #### 单例
@@ -85,7 +119,93 @@ SEL是在dyld加载镜像到内存时，通过_read_image方法加载到内存�
 两张表 Named Table NotificationName作为表的key， nameless table 没有传入NotificationName wildcard
 ```
 
+
+
 #### AutoreleasePool的实现原理
+
+AutoreleasePool 是 oc 的一种内存回收机制，正常情况下变量在超出作用域的时候 release，但是如果将变量加入到 pool 中，那么release 将延迟执行
+
+```
+AutoreleasePool 并没有单独的结构，而是由若干个 AutoreleasePoolPage 以**双向链表**形式组成
+
+1. PAGE_MAX_SIZE ：4KB，虚拟内存每个扇区的大小，内存对齐
+2. 内部 thread ，page 当前所在的线程，AutoreleasePool是按线程一一对应的
+3. 本身的成员变量占用56字节，剩下的内存存储了调用 autorelease 的变量的对象的地址，同时将一个哨兵插入page中
+4. pool_boundry 哨兵标记，哨兵其实就是一个空地址，用来区分每一个page 的边界
+5. 当一个Page被占满后，会新建一个page，并插入哨兵标记
+```
+
+单个自动释放池的执行过程就是`objc_autoreleasePoolPush()` —> `[object autorelease]` —> `objc_autoreleasePoolPop(void *)`
+
+具体实现如下：
+
+```c++
+void *objc_autoreleasePoolPush(void) {
+    return AutoreleasePoolPage::push();
+}
+
+void objc_autoreleasePoolPop(void *ctxt) {
+    AutoreleasePoolPage::pop(ctxt);
+}
+```
+
+内部实际上是对 AutoreleasePoolPage 的调用
+
+##### objc_autoreleasePoolPush
+
+每当自动释放池调用 objc_autoreleasePoolPush 时，都会把边界对象放进栈顶，然后返回边界对象，用于释放。
+
+`AutoreleasePoolPage::push();`  调用👇
+
+```c++
+static inline void *push() {
+   return autoreleaseFast(POOL_BOUNDARY);
+}
+```
+
+`autoreleaseFast`👇
+
+```c++
+static inline id *autoreleaseFast(id obj)
+{
+   AutoreleasePoolPage *page = hotPage();
+   if (page && !page->full()) {
+       return page->add(obj);
+   } else if (page) {
+       return autoreleaseFullPage(obj, page);
+   } else {
+       return autoreleaseNoPage(obj);
+   }
+}
+```
+
+👆上述方法分三种情况选择不同的代码执行：
+
+```
+- 有 hotPage 并且当前 page 不满，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
+- 有 hotPage 并且当前 page 已满，调用 autoreleaseFullPage 初始化一个新的页，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
+- 无 hotPage，调用 autoreleaseNoPage 创建一个 hotPage，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
+
+最后的都会调用 page->add(obj) 将对象添加到自动释放池中。 hotPage 可以理解为当前正在使用的 AutoreleasePoolPage。
+```
+
+
+
+#### AutoreleasePoolPage
+
+```objective-c
+是以栈的形式存在，并且内部对象通过进栈、出栈对应着 objc_autoreleasePoolPush 和 objc_autoreleasePoolPop
+  
+当我们对一个对象发送一条 autorelease 消息时，实际上是将这个对象地址加入到 autoreleasePoolPage 的栈顶 next 指针的指向的位置
+```
+
+
+
+### weak的实现原理，sideTable的内部结构
+
+weak表其实是一个hash表，key 是所指对象的地址，value 是 weak 指针的地址数组，
+
+sideTable是一个结构体，内部主要有引用计数表和弱引用表两个成员，内存存储的其实都是对象的地址、引用计数和weak变量的地址，而不是对象本身的数据
 
 ## Block
 
