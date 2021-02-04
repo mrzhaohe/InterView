@@ -199,7 +199,36 @@ static inline id *autoreleaseFast(id obj)
 当我们对一个对象发送一条 autorelease 消息时，实际上是将这个对象地址加入到 autoreleasePoolPage 的栈顶 next 指针的指向的位置
 ```
 
+#### copy
 
+##### **copy 与 strong** 
+
+使用 copy 的目的是为了让本对象的属性不受外界影响,使用 copy 无论给我传入是一个可变对象还是不可对象,我本身持有的就是一个不可变的副本.
+
+如果我们使用 strong ,那么这个属性就有可能指向一个可变对象,如果这个可变对象在外部被修改了,那么会影响该属性.
+
+```objective-c
+		NSMutableString *string = [[NSMutableString alloc] initWithString:@"0"];
+    
+    NSString *copyString = [string mutableCopy];
+    NSString *strongString = string;
+    
+    [string appendString:@"1"];
+    
+    NSLog(@"copyString = %@", copyString);
+    NSLog(@"strongString = %@", strongString);
+```
+
+
+
+##### copy 与 mutableCopy
+
+不可变对象 copy 指针拷贝  浅拷贝 仅此一种情况
+
+|            |        copy         | mutableCopy |
+| :--------: | :-----------------: | :---------: |
+| 不可变对象 | 浅拷贝 （指针拷贝） |   深拷贝    |
+|  可变对象  |       深拷贝        |   深拷贝    |
 
 ### weak的实现原理，sideTable的内部结构
 
@@ -226,6 +255,8 @@ __block的作用是什么
 ## Runtime
 
 ## Runloop
+
+`viewDidLoad`和`viewWillAppear`在同一个RunLoop循环中，所以在 `viewWillAppear` 方法中，
 
 ## 组件化
 

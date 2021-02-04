@@ -8,33 +8,42 @@
 #import "ViewController.h"
 
 @interface ViewController ()
-
+{
+    __weak NSString *string_weak;
+}
 @end
 
 @implementation ViewController
 
-__weak NSString *ref = nil;
-
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    // 场景一
+//    NSString *str =  [NSString stringWithFormat:@"https://ityongzhen.github.io/"];
+//    string_weak = str;
+
+    // 场景二
+//    @autoreleasepool {
+//        NSString *str = [NSString stringWithFormat:@"https://ityongzhen.github.io/"];
+//        string_weak = str;
+//    }
+//
+//    // 场景三
+    NSString *str = nil;
     @autoreleasepool {
-        NSString *str = [NSString stringWithFormat:@"sunnyxx"];
-        NSLog(@"%@", str);
+        str = [NSString stringWithFormat:@"https://ityongzhen.github.io/"];
+        string_weak = str;
     }
-    
-    
-    
+    NSLog(@"viewDidLoad: %@", string_weak);
+}
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    NSLog(@"viewWillAppear: %@", string_weak);
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    NSLog(@"%@", ref);
-    // Console: sunnyxx
-}
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    NSLog(@"%@", ref);
-    // Console: (null)
+    NSLog(@"viewDidAppear : %@", string_weak);
 }
 
 @end
