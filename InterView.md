@@ -123,6 +123,8 @@ SEL是在dyld加载镜像到内存时，通过_read_image方法加载到内存�
 
 #### AutoreleasePool的实现原理
 
+
+
 AutoreleasePool 是 oc 的一种内存回收机制，正常情况下变量在超出作用域的时候 release，但是如果将变量加入到 pool 中，那么release 将延迟执行
 
 ```
