@@ -243,8 +243,68 @@ sideTable是一个结构体，内部主要有引用计数表和弱引用表两�
 block的原理是什么 本质是什么
 
 ```
-oc对象 内部封装函数地址
+本质是一个 oc 对象， 内部也有一个 isa 指针
+内部封装了 block 执行逻辑的函数
 ```
+
+### Block 的本质 
+
+**结构体对象**
+
+```objective-c
+int age = 20;
+void (^block) (void) = ^ {
+	NSLog(@"age is %d", age);
+};
+```
+
+变量自动捕获👇  
+
+```c++
+struct __main_block_impl_0 {
+	struct __block_impl impl; //impl 结构体见👇
+	struct __main_block_desc_0* Desc;
+	int age;// 自动变量捕获
+}
+```
+
+```c++
+struct __block_impl {
+	void *isa;
+	int Flags;
+	int Reserved;
+	void *FuncPtr; //指向 block 内部实现的函数地址 (见👇)
+}
+```
+
+```c++
+// 封装了 block 执行逻辑的函数
+static void __main_block_func_0 () {
+	//TODO
+}
+```
+
+### 变量捕获
+
+auto 值传递
+
+static 指针传递
+
+全局变量 不捕获 直接访问
+
+局部变量需要捕获是因为需要跨函数访问
+
+### block 类型
+
+`继承自NSBlock类型`
+
+ ```
+ globleBlock 没有访问 auto 变量 （访问 static 和 全局变量仍让是 globelBlock）
+
+​ stackBlock 访问了 auto 变量 (MRC 下能打印出来, ARC下会自动调动 copy ---> mallocBlock)
+
+​ mallocBlock ----> stackBlock 调用了 copy
+ ```
 
 
 
