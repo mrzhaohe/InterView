@@ -292,9 +292,9 @@ static 指针传递
 
 全局变量 不捕获 直接访问
 
-局部变量需要捕获是因为需要跨函数访问
+局部变量需要捕获是因为需要`跨函数`访问
 
-### block 类型
+### Block 类型
 
 `继承自NSBlock类型`
 
@@ -303,12 +303,18 @@ static 指针传递
 
 ​ stackBlock 访问了 auto 变量 (MRC 下能打印出来, ARC下会自动调动 copy ---> mallocBlock)
 
-​ mallocBlock ----> stackBlock 调用了 copy
+​ mallocBlock ----> stackBlock 调用了 copy （栈 --- > 堆上）  
  ```
 
 
 
-__block的作用是什么
+### __block的作用
+
+`译器会将__block变量包装成一个对象`
+
+### Block 内存管理
+
+当 block 被 copy 到堆上时，会调用block内部的 copy 函数，copy 函数会调用 `__Block_object_assign`
 
 
 

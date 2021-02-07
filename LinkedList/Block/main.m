@@ -25,31 +25,33 @@ void test() {
     
 }
 
+
+void blockTest() {
+    ^{
+        NSLog(@"Hello, block!");
+    }();
+    
+    void (^block)(void) = ^{
+        NSLog(@"Hello, block!");
+    };
+    
+    block();
+    
+    int age = 10;
+    void (^block1)(int, int) = ^(int a, int b){
+        NSLog(@"Hello, block! -- %d", age);
+    };
+    
+    block1(1,1);
+}
+
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
-
-        test();
-        block();
-        
-//        ^{
-//            NSLog(@"Hello, block!");
-//        }();
-        
-//        void (^block)(void) = ^{
-//            NSLog(@"Hello, block!");
-//        };
-//
+//        blockTest();
+//        test();
 //        block();
         
-//        int age = 10;
-//        void (^block)(int, int) = ^(int a, int b){
-//            NSLog(@"Hello, block! -- %d", age);
-//        };
-//
-//        block(1,1);
-        
-        
-        
+
     }
     return 0;
 }
