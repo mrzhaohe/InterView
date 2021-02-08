@@ -310,13 +310,19 @@ static 指针传递
 
 ### __block的作用
 
-`译器会将__block变量包装成一个对象`
+`编译器会将__block变量包装成一个对象` 
+
+基本数据类型 int  `__Block_byref_age_0`
+
+![](https://tva1.sinaimg.cn/large/008eGmZEly1gng930adqfj30ec06c0tl.jpg)
+
+<img src="https://tva1.sinaimg.cn/large/008eGmZEly1gng939naeuj30mk07676r.jpg" style="zoom:67%;" />
+
+<img src="https://tva1.sinaimg.cn/large/008eGmZEly1gng92mq03kj30li09smyv.jpg" style="zoom: 67%;" />
 
 ### Block 内存管理
 
 当 block 被 copy 到堆上时，会调用block内部的 copy 函数，copy 函数会调用 `__Block_object_assign`
-
-
 
 ## 内存管理
 
