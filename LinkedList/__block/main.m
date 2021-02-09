@@ -11,6 +11,10 @@
 
 typedef void(^Block)(void);
 
+struct sss {
+    int age;
+};
+
 void testAssign() {
     
     __block int age = 10;

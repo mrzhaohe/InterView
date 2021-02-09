@@ -310,13 +310,30 @@ static 指针传递
 
 ### __block的作用
 
-`编译器会将__block变量包装成一个对象` 
+```
+__block 可解决 block 内部无法修改 auto 变量的问题 
+```
 
-基本数据类型 int  `__Block_byref_age_0`
+```
+编译器会将__block变量包装成一个对象 __Block_byref_xxx_0
+```
+
+基本数据类型 `int age = 0;` 编译器会将 age 包装成 `__Block_byref_age_0` 结构体
+
+
 
 ![](https://tva1.sinaimg.cn/large/008eGmZEly1gng930adqfj30ec06c0tl.jpg)
 
+```
+1.__main_block_impl_0 结构体内持有  __Block_byref_age_0
+2.__Block_byref_age_0 内部持有 __forwarding 指针指向自己
+```
+
+
+
 <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gng939naeuj30mk07676r.jpg" style="zoom:67%;" />
+
+
 
 <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gng92mq03kj30li09smyv.jpg" style="zoom: 67%;" />
 
@@ -330,7 +347,22 @@ static 指针传递
 
 ## Runloop
 
+[参考]: https://blog.csdn.net/u014600626/article/details/50864172
+
 `viewDidLoad`和`viewWillAppear`在同一个RunLoop循环中，所以在 `viewWillAppear` 方法中，
+
+一个运行着的程序就是一个进程或者一个任务。每个进程至少有一个线程，线程就是程序的执行流。创建好一个进程的同时，一个线程便同时开始运行，也就是主线程。每个进程有自己独立的虚拟内存空间，线程之间共用进程的内存空间。有些线程执行的任务是一条直线，起点到终点；在 iOS中，圆型的线程就是通过run loop不停的循环实现的。
+
+```
+1.每个线程包括主线程都有与之对应的 runloop 对象，线程和 runloop 对象是一一对应的；
+2.Runloop 保存在一个全局字典中，线程为key, runloop为value
+3.主线程的 runloop 是默认创建好的，子线程的 runloop 需要手动开启
+4.runloop 在第一次获取时创建，在线程结束时销毁
+```
+
+
+
+
 
 ## 组件化
 
