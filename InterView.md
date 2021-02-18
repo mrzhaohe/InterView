@@ -347,18 +347,84 @@ __block 可解决 block 内部无法修改 auto 变量的问题
 
 ## Runloop
 
-[参考]: https://blog.csdn.net/u014600626/article/details/50864172
+### 面试题
 
-`viewDidLoad`和`viewWillAppear`在同一个RunLoop循环中，所以在 `viewWillAppear` 方法中，
+#### runloop内部实现逻辑
 
-一个运行着的程序就是一个进程或者一个任务。每个进程至少有一个线程，线程就是程序的执行流。创建好一个进程的同时，一个线程便同时开始运行，也就是主线程。每个进程有自己独立的虚拟内存空间，线程之间共用进程的内存空间。有些线程执行的任务是一条直线，起点到终点；在 iOS中，圆型的线程就是通过run loop不停的循环实现的。
+#### runloop和线程的关系
 
 ```
+一个运行着的程序就是一个进程或者一个任务。每个进程至少有一个线程，线程就是程序的执行流。创建好一个进程的同时，一个线程便同时开始运行，也就是主线程。每个进程有自己独立的虚拟内存空间，线程之间共用进程的内存空间。有些线程执行的任务是一条直线，起点到终点；在 iOS中，圆型的线程就是通过run loop不停的循环实现的。
 1.每个线程包括主线程都有与之对应的 runloop 对象，线程和 runloop 对象是一一对应的；
-2.Runloop 保存在一个全局字典中，线程为key, runloop为value
+2.Runloop 保存在一个全局字典中，线程为key, runloop为value CFDictionaryGetValue
 3.主线程的 runloop 是默认创建好的，子线程的 runloop 需要手动开启
 4.runloop 在第一次获取时创建，在线程结束时销毁
 ```
+
+#### timer 和 runloop 的关系
+
+#### runloop 是怎么相应用户操作的，具体操作流程是什么
+
+```
+首先由Source1捕捉系统事件，然后包装成eventqueue，传递给Source0处理触摸事件
+```
+
+#### runloop的几种状态
+
+```
+Entry
+beforeTimers
+beforeSources
+beforeWaiting
+afterWaiting
+exit
+```
+
+#### runloop的mode作用是什么
+
+```
+mode作用是用来隔离, 将不同组的Source0、Source1、timer、Observer 隔离开来，互不影响
+主要有 
+defaultMode : app的默认 mode，通常主线程在这个mode下运行
+UITrackingMode : 界面追踪 mode, 用于scrollview追踪触摸滑动，保证界面滑动时不受其他 Mode 影响
+```
+
+#### runloop 在实际开发中的作用
+
+控制线程生命周期（线程保活）
+
+检测应用卡顿
+
+性能优化
+
+[参考]: https://blog.csdn.net/u014600626/article/details/50864172
+
+`viewDidLoad`和`viewWillAppear`在同一个RunLoop循环中
+
+[详解autoreleasepool]: http://www.cocoachina.com/cms/wap.php?action=article&amp;id=87115
+
+
+
+UIApplicationMain 启动了 runloop
+
+#### Runloop 休眠的实现原理
+
+用户态和内核态之间的相互切换
+
+mach_msg()
+
+用户态 ----> 内核态 （等待消息）
+
+内核态 ---->用户态 （处理消息）
+
+```
+内核态：
+等待消息
+没有消息就让线程休眠
+有消息就唤醒线程
+```
+
+
 
 
 
@@ -368,11 +434,15 @@ __block 可解决 block 内部无法修改 auto 变量的问题
 
 ## 设计模式
 
+## 插件化
+
 ## 算法
 
 ## 链表
 
 ## 二叉树
+
+
 
 
 
