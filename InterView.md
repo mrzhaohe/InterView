@@ -121,86 +121,6 @@ SEL是在dyld加载镜像到内存时，通过_read_image方法加载到内存�
 
 
 
-#### AutoreleasePool的实现原理
-
-
-
-AutoreleasePool 是 oc 的一种内存回收机制，正常情况下变量在超出作用域的时候 release，但是如果将变量加入到 pool 中，那么release 将延迟执行
-
-```
-AutoreleasePool 并没有单独的结构，而是由若干个 AutoreleasePoolPage 以**双向链表**形式组成
-
-1. PAGE_MAX_SIZE ：4KB，虚拟内存每个扇区的大小，内存对齐
-2. 内部 thread ，page 当前所在的线程，AutoreleasePool是按线程一一对应的
-3. 本身的成员变量占用56字节，剩下的内存存储了调用 autorelease 的变量的对象的地址，同时将一个哨兵插入page中
-4. pool_boundry 哨兵标记，哨兵其实就是一个空地址，用来区分每一个page 的边界
-5. 当一个Page被占满后，会新建一个page，并插入哨兵标记
-```
-
-单个自动释放池的执行过程就是`objc_autoreleasePoolPush()` —> `[object autorelease]` —> `objc_autoreleasePoolPop(void *)`
-
-具体实现如下：
-
-```c++
-void *objc_autoreleasePoolPush(void) {
-    return AutoreleasePoolPage::push();
-}
-
-void objc_autoreleasePoolPop(void *ctxt) {
-    AutoreleasePoolPage::pop(ctxt);
-}
-```
-
-内部实际上是对 AutoreleasePoolPage 的调用
-
-##### objc_autoreleasePoolPush
-
-每当自动释放池调用 objc_autoreleasePoolPush 时，都会把边界对象放进栈顶，然后返回边界对象，用于释放。
-
-`AutoreleasePoolPage::push();`  调用👇
-
-```c++
-static inline void *push() {
-   return autoreleaseFast(POOL_BOUNDARY);
-}
-```
-
-`autoreleaseFast`👇
-
-```c++
-static inline id *autoreleaseFast(id obj)
-{
-   AutoreleasePoolPage *page = hotPage();
-   if (page && !page->full()) {
-       return page->add(obj);
-   } else if (page) {
-       return autoreleaseFullPage(obj, page);
-   } else {
-       return autoreleaseNoPage(obj);
-   }
-}
-```
-
-👆上述方法分三种情况选择不同的代码执行：
-
-```
-- 有 hotPage 并且当前 page 不满，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
-- 有 hotPage 并且当前 page 已满，调用 autoreleaseFullPage 初始化一个新的页，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
-- 无 hotPage，调用 autoreleaseNoPage 创建一个 hotPage，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
-
-最后的都会调用 page->add(obj) 将对象添加到自动释放池中。 hotPage 可以理解为当前正在使用的 AutoreleasePoolPage。
-```
-
-
-
-#### AutoreleasePoolPage
-
-```objective-c
-是以栈的形式存在，并且内部对象通过进栈、出栈对应着 objc_autoreleasePoolPush 和 objc_autoreleasePoolPop
-  
-当我们对一个对象发送一条 autorelease 消息时，实际上是将这个对象地址加入到 autoreleasePoolPage 的栈顶 next 指针的指向的位置
-```
-
 #### copy
 
 ##### **copy 与 strong** 
@@ -347,29 +267,31 @@ __block 可解决 block 内部无法修改 auto 变量的问题
 
 ## Runloop
 
+https://blog.csdn.net/u014600626/article/details/50864172 
+
 ### 面试题
 
-#### runloop内部实现逻辑
+#### Runloop 内部实现逻辑
 
-#### runloop和线程的关系
+#### Runloop 和线程的关系
 
 ```
-一个运行着的程序就是一个进程或者一个任务。每个进程至少有一个线程，线程就是程序的执行流。创建好一个进程的同时，一个线程便同时开始运行，也就是主线程。每个进程有自己独立的虚拟内存空间，线程之间共用进程的内存空间。有些线程执行的任务是一条直线，起点到终点；在 iOS中，圆型的线程就是通过run loop不停的循环实现的。
+一个运行着的程序就是一个进程或者一个任务。每个进程至少有一个线程，线程就是程序的执行流。创建好一个进程的同时，一个线程便同时开始运行，也就是主线程。每个进程有自己独立的虚拟内存空间，线程之间共用进程的内存空间。有些线程执行的任务是一条直线，起点到终点；在 iOS 中，圆型的线程就是通过run loop不停的循环实现的。
 1.每个线程包括主线程都有与之对应的 runloop 对象，线程和 runloop 对象是一一对应的；
 2.Runloop 保存在一个全局字典中，线程为key, runloop为value CFDictionaryGetValue
-3.主线程的 runloop 是默认创建好的，子线程的 runloop 需要手动开启
+3.主线程会默认开启 runloop , 子线程默认不会开启，需要手动开启
 4.runloop 在第一次获取时创建，在线程结束时销毁
 ```
 
-#### timer 和 runloop 的关系
+#### timer 和 Runloop 的关系
 
-#### runloop 是怎么相应用户操作的，具体操作流程是什么
+#### Runloop 是怎么相应用户操作的，具体操作流程是什么
 
 ```
 首先由Source1捕捉系统事件，然后包装成eventqueue，传递给Source0处理触摸事件
 ```
 
-#### runloop的几种状态
+#### Runloop的几种状态
 
 ```
 Entry
@@ -380,7 +302,7 @@ afterWaiting
 exit
 ```
 
-#### runloop的mode作用是什么
+#### Runloop 的mode作用是什么
 
 ```
 mode作用是用来隔离, 将不同组的Source0、Source1、timer、Observer 隔离开来，互不影响
@@ -389,23 +311,13 @@ defaultMode : app的默认 mode，通常主线程在这个mode下运行
 UITrackingMode : 界面追踪 mode, 用于scrollview追踪触摸滑动，保证界面滑动时不受其他 Mode 影响
 ```
 
-#### runloop 在实际开发中的作用
+#### Runloop 在实际开发中的作用
 
 控制线程生命周期（线程保活）
 
 检测应用卡顿
 
 性能优化
-
-[参考]: https://blog.csdn.net/u014600626/article/details/50864172
-
-`viewDidLoad`和`viewWillAppear`在同一个RunLoop循环中
-
-[详解autoreleasepool]: http://www.cocoachina.com/cms/wap.php?action=article&amp;id=87115
-
-
-
-UIApplicationMain 启动了 runloop
 
 #### Runloop 休眠的实现原理
 
@@ -424,11 +336,109 @@ mach_msg()
 有消息就唤醒线程
 ```
 
+### other
+
+`viewDidLoad`和`viewWillAppear`在同一个RunLoop循环中
+
+UIApplicationMain 启动了 runloop
+
+## AutoReleasePool
 
 
 
+[详解autoreleasepool]: http://www.cocoachina.com/cms/wap.php?action=article&amp;id=87115
+
+#### AutoreleasePool的实现原理
 
 
+
+AutoreleasePool 是 oc 的一种内存回收机制，正常情况下变量在超出作用域的时候 release，但是如果将变量加入到 pool 中，那么release 将延迟执行
+
+```
+AutoreleasePool 并没有单独的结构，而是由若干个 AutoreleasePoolPage 以**双向链表**形式组成
+
+1. PAGE_MAX_SIZE ：4KB，虚拟内存每个扇区的大小，内存对齐
+2. 内部 thread ，page 当前所在的线程，AutoreleasePool是按线程一一对应的
+3. 本身的成员变量占用56字节，剩下的内存存储了调用 autorelease 的变量的对象的地址，同时将一个哨兵插入page中
+4. pool_boundry 哨兵标记，哨兵其实就是一个空地址，用来区分每一个page 的边界
+5. 当一个Page被占满后，会新建一个page，并插入哨兵标记
+```
+
+单个自动释放池的执行过程就是`objc_autoreleasePoolPush()` —> `[object autorelease]` —> `objc_autoreleasePoolPop(void *)`
+
+具体实现如下：
+
+```c++
+void *objc_autoreleasePoolPush(void) {
+    return AutoreleasePoolPage::push();
+}
+
+void objc_autoreleasePoolPop(void *ctxt) {
+    AutoreleasePoolPage::pop(ctxt);
+}
+```
+
+内部实际上是对 AutoreleasePoolPage 的调用
+
+##### objc_autoreleasePoolPush
+
+每当自动释放池调用 objc_autoreleasePoolPush 时，都会把边界对象放进栈顶，然后返回边界对象，用于释放。
+
+`AutoreleasePoolPage::push();`  调用👇
+
+```c++
+static inline void *push() {
+   return autoreleaseFast(POOL_BOUNDARY);
+}
+```
+
+`autoreleaseFast`👇
+
+```c++
+static inline id *autoreleaseFast(id obj)
+{
+   AutoreleasePoolPage *page = hotPage();
+   if (page && !page->full()) {
+       return page->add(obj);
+   } else if (page) {
+       return autoreleaseFullPage(obj, page);
+   } else {
+       return autoreleaseNoPage(obj);
+   }
+}
+```
+
+👆上述方法分三种情况选择不同的代码执行：
+
+```
+- 有 hotPage 并且当前 page 不满，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
+- 有 hotPage 并且当前 page 已满，调用 autoreleaseFullPage 初始化一个新的页，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
+- 无 hotPage，调用 autoreleaseNoPage 创建一个 hotPage，调用 page->add(obj) 方法将对象添加至 AutoreleasePoolPage 的栈中
+
+最后的都会调用 page->add(obj) 将对象添加到自动释放池中。 hotPage 可以理解为当前正在使用的 AutoreleasePoolPage。
+```
+
+
+
+#### AutoreleasePoolPage
+
+```objective-c
+是以栈的形式存在，并且内部对象通过进栈、出栈对应着 objc_autoreleasePoolPush 和 objc_autoreleasePoolPop
+  
+当我们对一个对象发送一条 autorelease 消息时，实际上是将这个对象地址加入到 autoreleasePoolPage 的栈顶 next 指针的指向的位置
+```
+
+#### 
+
+## 多线程
+
+### 线程与队列
+
+同步、异步 Dispatch_async 和 dispatch_sync 决定了是否开启新的线程
+
+并发、串行 concurrent 、serial 队列的类型决定了任务的执行方式
+
+### 死锁
 
 ## 组件化
 
