@@ -29,10 +29,20 @@
 			<key>orderHint</key>
 			<integer>9</integer>
 		</dict>
+		<key>LockDemo.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>17</integer>
+		</dict>
 		<key>Msg_send.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+		<key>OSSpinLock.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>16</integer>
 		</dict>
 		<key>__block.xcscheme_^#shared#^_</key>
 		<dict>
@@ -73,6 +83,11 @@
 		<dict>
 			<key>orderHint</key>
 			<integer>6</integer>
+		</dict>
+		<key>线程与Runloop.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>15</integer>
 		</dict>
 		<key>队列.xcscheme_^#shared#^_</key>
 		<dict>

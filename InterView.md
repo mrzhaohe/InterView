@@ -440,6 +440,42 @@ static inline id *autoreleaseFast(id obj)
 
 ### 死锁
 
+使用 sync 向**当前串行队列**中添加任务，会卡住当前的串行队列（产生死锁）
+
+### 锁
+
+#### OSSpinLock
+
+自旋锁不再安全 等待锁的线程会处于**忙等**状态，一直占用着CPU的资源
+
+可能会出现优先级反转的问题
+
+#### os_unfair_lock
+
+从底层调用来看，等待 os_unfair_lock 锁的线程处于**休眠**状态，并非忙等
+
+#### pthread_mutex
+
+##### 互斥锁 normal  
+
+##### 递归锁 
+
+
+
+![](https://tva1.sinaimg.cn/large/e6c9d24ely1go3mu4x8hnj20ys0aq0wk.jpg)
+
+##### 条件锁
+
+```objective-c
+pthread_cond_t
+
+pthread_cond_wait
+
+pthread_cond_signal
+```
+
+
+
 ## 组件化
 
 ## 设计模式
