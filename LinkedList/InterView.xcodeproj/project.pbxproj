@@ -23,6 +23,8 @@
 		6295F65225CED90700D71A48 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6295F65125CED90700D71A48 /* main.m */; };
 		6295F67025CEE66D00D71A48 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6295F66F25CEE66D00D71A48 /* Person.m */; };
 		8608F69425CB842B006673AE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8608F69325CB842B006673AE /* main.m */; };
+		8614F8AD25ED0486006C5A38 /* SerialQueueDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8614F8AC25ED0486006C5A38 /* SerialQueueDemo.m */; };
+		8614F8C225ED084C006C5A38 /* SemphoreDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8614F8C125ED084C006C5A38 /* SemphoreDemo.m */; };
 		86520C8C25D13F2800FB3ABC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 86520C8B25D13F2800FB3ABC /* main.m */; };
 		86520C9F25D1408A00FB3ABC /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 86520C9E25D1408A00FB3ABC /* Person.m */; };
 		8681B53025E28BEB007244A0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8681B52F25E28BEB007244A0 /* main.m */; };
@@ -232,6 +234,10 @@
 		6295F66F25CEE66D00D71A48 /* Person.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		8608F69125CB842B006673AE /* copy_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = copy_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		8608F69325CB842B006673AE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		8614F8AB25ED0486006C5A38 /* SerialQueueDemo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SerialQueueDemo.h; sourceTree = "<group>"; };
+		8614F8AC25ED0486006C5A38 /* SerialQueueDemo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SerialQueueDemo.m; sourceTree = "<group>"; };
+		8614F8C025ED084C006C5A38 /* SemphoreDemo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SemphoreDemo.h; sourceTree = "<group>"; };
+		8614F8C125ED084C006C5A38 /* SemphoreDemo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SemphoreDemo.m; sourceTree = "<group>"; };
 		86520C8925D13F2800FB3ABC /* __block */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = __block; sourceTree = BUILT_PRODUCTS_DIR; };
 		86520C8B25D13F2800FB3ABC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		86520C9D25D1408A00FB3ABC /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
@@ -681,6 +687,10 @@
 				8681B69825EBE2C1007244A0 /* pthread_mutex2Demo.m */,
 				8681B6AC25EBE4C3007244A0 /* pthread_mutex_condition_demo.h */,
 				8681B6AD25EBE4C3007244A0 /* pthread_mutex_condition_demo.m */,
+				8614F8AB25ED0486006C5A38 /* SerialQueueDemo.h */,
+				8614F8AC25ED0486006C5A38 /* SerialQueueDemo.m */,
+				8614F8C025ED084C006C5A38 /* SemphoreDemo.h */,
+				8614F8C125ED084C006C5A38 /* SemphoreDemo.m */,
 			);
 			path = LockDemo;
 			sourceTree = "<group>";
@@ -1329,9 +1339,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				8681B69925EBE2C1007244A0 /* pthread_mutex2Demo.m in Sources */,
+				8614F8AD25ED0486006C5A38 /* SerialQueueDemo.m in Sources */,
 				8681B64B25EBD2AB007244A0 /* OSUnfairLockDemo.m in Sources */,
 				8681B5EC25E3A044007244A0 /* ViewController.m in Sources */,
 				8681B5E625E3A044007244A0 /* AppDelegate.m in Sources */,
+				8614F8C225ED084C006C5A38 /* SemphoreDemo.m in Sources */,
 				8681B60F25E3A063007244A0 /* BaseLockDemo.m in Sources */,
 				8681B5F725E3A046007244A0 /* main.m in Sources */,
 				8681B5E925E3A044007244A0 /* SceneDelegate.m in Sources */,

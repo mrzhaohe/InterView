@@ -12,6 +12,8 @@
 #import "pthread_MutexDemo.h"
 #import "pthread_Mutex2Demo.h"
 #import "pthread_mutex_condition_demo.h"
+#import "SerialQueueDemo.h"
+#import "SemphoreDemo.h"
 
 @interface ViewController ()
 
@@ -37,8 +39,14 @@
     // pthread_mutex 递归锁
     lock = [pthread_mutex2Demo new];
     
-    //
+    // 条件锁
     lock = [pthread_mutex_condition_demo new];
+    
+    // 串行队列
+    lock = [SerialQueueDemo new];
+    
+    // 信号量
+    lock = [SemphoreDemo new];
     [lock otherTest];
 //    [lock moneyTest];
 //    [lock ticketTest];
