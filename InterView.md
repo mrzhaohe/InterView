@@ -518,6 +518,22 @@ CPU资源不紧张
 CPU资源紧张
 ```
 
+### 读写安全
+
+atomic
+
+### 多读单写
+
+pthread_rwlock : 读写锁
+
+```
+等待的锁 会进入休眠
+```
+
+<img src="https://tva1.sinaimg.cn/large/e6c9d24ely1go73qnpv6tj20oi06uq4g.jpg" style="zoom:67%;" />
+
+dispatch_barrier_async：栅栏函数
+
 
 
 ## 组件化
