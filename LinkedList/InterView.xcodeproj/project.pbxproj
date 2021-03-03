@@ -25,6 +25,7 @@
 		8608F69425CB842B006673AE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8608F69325CB842B006673AE /* main.m */; };
 		8614F8AD25ED0486006C5A38 /* SerialQueueDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8614F8AC25ED0486006C5A38 /* SerialQueueDemo.m */; };
 		8614F8C225ED084C006C5A38 /* SemphoreDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8614F8C125ED084C006C5A38 /* SemphoreDemo.m */; };
+		8614F8D725EF7672006C5A38 /* SynchronizedDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8614F8D625EF7672006C5A38 /* SynchronizedDemo.m */; };
 		86520C8C25D13F2800FB3ABC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 86520C8B25D13F2800FB3ABC /* main.m */; };
 		86520C9F25D1408A00FB3ABC /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 86520C9E25D1408A00FB3ABC /* Person.m */; };
 		8681B53025E28BEB007244A0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8681B52F25E28BEB007244A0 /* main.m */; };
@@ -238,6 +239,9 @@
 		8614F8AC25ED0486006C5A38 /* SerialQueueDemo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SerialQueueDemo.m; sourceTree = "<group>"; };
 		8614F8C025ED084C006C5A38 /* SemphoreDemo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SemphoreDemo.h; sourceTree = "<group>"; };
 		8614F8C125ED084C006C5A38 /* SemphoreDemo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SemphoreDemo.m; sourceTree = "<group>"; };
+		8614F8D525EF7672006C5A38 /* SynchronizedDemo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SynchronizedDemo.h; sourceTree = "<group>"; };
+		8614F8D625EF7672006C5A38 /* SynchronizedDemo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SynchronizedDemo.m; sourceTree = "<group>"; };
+		8614F8EA25EF7690006C5A38 /* LockDemoProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LockDemoProtocol.h; sourceTree = "<group>"; };
 		86520C8925D13F2800FB3ABC /* __block */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = __block; sourceTree = BUILT_PRODUCTS_DIR; };
 		86520C8B25D13F2800FB3ABC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		86520C9D25D1408A00FB3ABC /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
@@ -670,6 +674,7 @@
 				8681B5E825E3A044007244A0 /* SceneDelegate.m */,
 				8681B5EA25E3A044007244A0 /* ViewController.h */,
 				8681B5EB25E3A044007244A0 /* ViewController.m */,
+				8614F8EA25EF7690006C5A38 /* LockDemoProtocol.h */,
 				8681B5ED25E3A044007244A0 /* Main.storyboard */,
 				8681B5F025E3A046007244A0 /* Assets.xcassets */,
 				8681B5F225E3A046007244A0 /* LaunchScreen.storyboard */,
@@ -691,6 +696,8 @@
 				8614F8AC25ED0486006C5A38 /* SerialQueueDemo.m */,
 				8614F8C025ED084C006C5A38 /* SemphoreDemo.h */,
 				8614F8C125ED084C006C5A38 /* SemphoreDemo.m */,
+				8614F8D525EF7672006C5A38 /* SynchronizedDemo.h */,
+				8614F8D625EF7672006C5A38 /* SynchronizedDemo.m */,
 			);
 			path = LockDemo;
 			sourceTree = "<group>";
@@ -1343,6 +1350,7 @@
 				8681B64B25EBD2AB007244A0 /* OSUnfairLockDemo.m in Sources */,
 				8681B5EC25E3A044007244A0 /* ViewController.m in Sources */,
 				8681B5E625E3A044007244A0 /* AppDelegate.m in Sources */,
+				8614F8D725EF7672006C5A38 /* SynchronizedDemo.m in Sources */,
 				8614F8C225ED084C006C5A38 /* SemphoreDemo.m in Sources */,
 				8681B60F25E3A063007244A0 /* BaseLockDemo.m in Sources */,
 				8681B5F725E3A046007244A0 /* main.m in Sources */,

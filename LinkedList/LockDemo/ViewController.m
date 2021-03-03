@@ -14,6 +14,7 @@
 #import "pthread_mutex_condition_demo.h"
 #import "SerialQueueDemo.h"
 #import "SemphoreDemo.h"
+#import "SynchronizedDemo.h"
 
 @interface ViewController ()
 
@@ -47,9 +48,13 @@
     
     // 信号量
     lock = [SemphoreDemo new];
-    [lock otherTest];
-//    [lock moneyTest];
-//    [lock ticketTest];
+    
+    //
+    lock = [SynchronizedDemo new];
+    
+//    [lock otherTest];
+    [lock moneyTest];
+    [lock ticketTest];
     
 }
 

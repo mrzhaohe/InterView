@@ -10,6 +10,8 @@
 @interface SemphoreDemo ()
 
 @property (nonatomic, strong) dispatch_semaphore_t sem;
+@property (nonatomic, strong) dispatch_semaphore_t m_sem;
+@property (nonatomic, strong) dispatch_semaphore_t t_sem;
 
 @end
 
@@ -20,8 +22,29 @@
     self = [super init];
     if (self) {
         self.sem = dispatch_semaphore_create(5);
+        self.m_sem = dispatch_semaphore_create(1);
+        self.t_sem = dispatch_semaphore_create(1);
+        
     }
     return self;
+}
+
+- (void)drawMoney {
+    dispatch_semaphore_wait(self.m_sem, DISPATCH_TIME_FOREVER);
+    [super drawMoney];
+    dispatch_semaphore_signal(self.m_sem);
+}
+
+- (void)saveMoney {
+    dispatch_semaphore_wait(self.m_sem, DISPATCH_TIME_FOREVER);
+    [super saveMoney];
+    dispatch_semaphore_signal(self.m_sem);
+}
+
+- (void)saleTicket {
+    dispatch_semaphore_wait(self.t_sem, DISPATCH_TIME_FOREVER);
+    [super saleTicket];
+    dispatch_semaphore_signal(self.t_sem);
 }
 
 - (void)otherTest {

@@ -444,7 +444,9 @@ static inline id *autoreleaseFast(id obj)
 
 ### 锁
 
-#### OSSpinLock
+#### OSSpinLock （自旋锁）
+
+High-level lock
 
 自旋锁不再安全 等待锁的线程会处于**忙等**状态，一直占用着CPU的资源
 
@@ -454,13 +456,13 @@ static inline id *autoreleaseFast(id obj)
 
 从底层调用来看，等待 os_unfair_lock 锁的线程处于**休眠**状态，并非忙等
 
-#### pthread_mutex
+#### pthread_mutex （互斥锁）
+
+需要销毁
 
 ##### 互斥锁 normal  
 
 ##### 递归锁 
-
-
 
 ![](https://tva1.sinaimg.cn/large/e6c9d24ely1go3mu4x8hnj20ys0aq0wk.jpg)
 
@@ -472,6 +474,48 @@ pthread_cond_t
 pthread_cond_wait
 
 pthread_cond_signal
+```
+
+#### NSLock
+
+对 pthread_mutex 默认封装
+
+#### NSRecursiveLock
+
+#### NSCondition
+
+对 NSConditionLock 和 NSCondition的封装
+
+wait 
+
+signal
+
+#### SerialQueue
+
+gcd 串行队列
+
+#### Semphore
+
+
+
+#### @synthronized
+
+```
+@synthronized(obj)  obj 传递进去 syncData（hashmap）一个 obj 对应一把锁 （pmutext_lock） 
+obj对应的递归锁，然后进行加锁、解锁操作
+```
+
+自旋锁和互斥锁区别
+
+```
+自旋锁 （不休眠）
+预计线程等待锁的时间很短
+CPU资源不紧张
+
+互斥锁
+预计等待锁的时间较长
+有IO操作
+CPU资源紧张
 ```
 
 

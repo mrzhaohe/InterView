@@ -7,9 +7,11 @@
 
 #import <Foundation/Foundation.h>
 
+#import "LockDemoProtocol.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BaseLockDemo : NSObject
+@interface BaseLockDemo : NSObject<LockDemoProtocol>
 
 - (void)moneyTest;
 
@@ -17,11 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)otherTest;
 
-- (void)saleTicket;
 
-- (void)saveMoney;
-
-- (void)drawMoney;
 
 @end
 
