@@ -2,6 +2,26 @@
 
 # InterView
 
+## LLVM 
+
+`Objective C/C/C++` 使用的编译器前端是**Clang**，Swift是**swift**，后端都是**LLVM**.
+
+### 编译流程
+
+1. 源文件 
+2. 预处理阶段：宏的展开，头文件的导入
+3. 编译阶段 ①词法分析 ②语法分析 ③生成中间代码IR
+4. 生成汇编代码
+5. 生成目标文件 （机器代码）
+6. 链接 ： 链接需要的动态和静态库，生成可执行文件
+7. 绑定：Bind 可执行文件
+
+
+
+
+
+
+
 ## 底层原理
 
 ### OC对象
@@ -157,6 +177,32 @@ SEL是在dyld加载镜像到内存时，通过_read_image方法加载到内存�
 weak表其实是一个hash表，key 是所指对象的地址，value 是 weak 指针的地址数组，
 
 sideTable是一个结构体，内部主要有引用计数表和弱引用表两个成员，内存存储的其实都是对象的地址、引用计数和weak变量的地址，而不是对象本身的数据
+
+### alloc init new 
+
+- 对象的开辟内存交由 `alloc` 方法封装
+- `init` 只是一种工厂设计方案，为了方便子类重写：自定义实现，提供一些初始化就伴随的东西
+- `new` 封装了 `alloc 和init`
+
+### dealloc
+
+
+
+## UIImage 解码
+
+1、转成 cgImage 
+
+2、创建上下文对象 contextRef (位图信息bitmapInfo)
+
+3、将cgimage 画在 上下文上
+
+4、得到新的 cgImage
+
+5、uiimage *newImage = CGBitMapContextCreateImage( cgImage);
+
+
+
+
 
 ## Block
 
@@ -350,6 +396,12 @@ UIApplicationMain 启动了 runloop
 
 #### AutoreleasePool的实现原理
 
+@autoreleasePool  =   **__AtAutoreleasePool**   __autoreleasePool
+
+```
+__AtAutoreleasePool 结构体
+```
+
 
 
 AutoreleasePool 是 oc 的一种内存回收机制，正常情况下变量在超出作用域的时候 release，但是如果将变量加入到 pool 中，那么release 将延迟执行
@@ -430,6 +482,20 @@ static inline id *autoreleaseFast(id obj)
 
 #### 
 
+## 	Runloop 与 Autorelease
+
+iOS 在主线程注册了两个 observer
+
+__第一个observer __
+
+监听了 kCFRunloopEntry, 会调用 objc_autoreleasePool_push()
+
+__第二个 observer__
+
+监听了 kCFRunloopBeforeWaiting 会调用 objc_autoreleasePool_pop() 、objc_autoreleasePool_push()
+
+监听了 kCFRunloopExit 事件，会调用 objc_autoreleasePool_pop()
+
 ## 多线程
 
 ### 线程与队列
@@ -500,12 +566,16 @@ gcd 串行队列
 
 #### @synthronized
 
+互斥递归锁
+
 ```
 @synthronized(obj)  obj 传递进去 syncData（hashmap）一个 obj 对应一把锁 （pmutext_lock） 
 obj对应的递归锁，然后进行加锁、解锁操作
+
+进入SyncData的定义，是一个结构体，主要用来表示一个线程data，类似于链表结构，有next指向，且封装了recursive_mutex_t属性，可以确认@synchronized确实是一个递归互斥锁
 ```
 
-自旋锁和互斥锁区别
+#### 自旋锁和互斥锁区别
 
 ```
 自旋锁 （不休眠）
@@ -520,7 +590,7 @@ CPU资源紧张
 
 ### 读写安全
 
-atomic
+atomic 读写加锁 danshi  release 不加锁
 
 ### 多读单写
 
@@ -532,11 +602,60 @@ pthread_rwlock : 读写锁
 
 <img src="https://tva1.sinaimg.cn/large/e6c9d24ely1go73qnpv6tj20oi06uq4g.jpg" style="zoom:67%;" />
 
-dispatch_barrier_async：栅栏函数
+dispatch_barrier_async：异步栅栏函数
+
+```
+queue 必须是自己手动创建的并发队列
+```
+
+<img src="https://tva1.sinaimg.cn/large/e6c9d24ely1go7o8nzh8yj21hq0ioalx.jpg" style="zoom:40%;" />
+
+
+
+### 定时器
+
+NSProxy 没有 init 方法
+
+如果调用 nsproxy 发送消息，他会直接调用
+
+## 内存布局
+
+
+
+<img src="https://tva1.sinaimg.cn/large/008eGmZEly1go88t2nr4rj31ig0totvh.jpg" style="zoom:67%;" />
+
+Tagged Pointer
+
+```
+从64bit开始，iOS引入了Tagged Pointer技术，用于优化NSNumber、NSDate、NSString等小对象的存储
+
+在没有使用Tagged Pointer之前， NSNumber等对象需要动态分配内存、维护引用计数等，NSNumber指针存储的是堆中NSNumber对象的地址值
+
+使用Tagged Pointer之后，NSNumber指针里面存储的数据变成了：Tag + Data，也就是将数据直接存储在了指针中
+
+当指针不够存储数据时，才会使用动态分配内存的方式来存储数据
+
+objc_msgSend能识别Tagged Pointer，比如NSNumber的intValue方法，直接从指针提取数据，节省了以前的调用开销
+
+如何判断一个指针是否为Tagged Pointer？
+iOS平台，最高有效位是1（第64bit）  16进制转为2进制
+
+isTaggerPointer 
+
+pointer & 1
+
+Mac平台，最低有效位是1
+```
+
+## 内存管理
 
 
 
 ## 组件化
+
+### Beehive
+
+### Bifrost
 
 ## 设计模式
 
@@ -544,15 +663,60 @@ dispatch_barrier_async：栅栏函数
 
 ## 算法
 
-## 链表
+### 链表
 
-## 二叉树
+### 二叉树
+
+## 性能优化
+
+### 卡顿
+
+### 离屏渲染
+
+定义：在当前屏幕缓冲区外开辟一个缓冲区进行渲染操作
+
+**离屏渲染消耗性能的原因**
+
+```
+1、需要创建新的缓冲区
+2、离屏渲染的过程中，需要多次切换上下文环境，先是从 当前屏幕切换到离屏；等到离屏渲染完毕后，将离屏缓冲区的渲染结果显示到屏幕上，又需要将上下文环境从离屏切换到当前屏幕
+```
+
+离屏渲染产生的原因
+
+```
+1、光栅化 layer.shouldRasterize = YES;
+2、遮罩 layer.mask
+3、圆角 可使用 coreGraphic 绘制圆角解决
+4、阴影 layer.shadowxxx  如果设置了 path 就不会触发离屏渲染
+```
 
 
 
+### 冷启动
+
+dyld
+
+动态库加载
+
+runtime
+
+加载分类
+
+main
+
+## 面试
+
+隐式动画
+
+Tableview 复用原理
+
+字节面试
+
+https://zhuanlan.zhihu.com/p/300978291
 
 
 
+TCP和UDP区别，如何实现流量控制和拥塞控制
 
-
-
+https://juejin.cn/post/6936173181321347102
