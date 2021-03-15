@@ -307,7 +307,7 @@ __block 可解决 block 内部无法修改 auto 变量的问题
 
 当 block 被 copy 到堆上时，会调用block内部的 copy 函数，copy 函数会调用 `__Block_object_assign`
 
-## 内存管理
+## 
 
 ## Runtime
 
@@ -340,13 +340,46 @@ https://blog.csdn.net/u014600626/article/details/50864172
 #### Runloop的几种状态
 
 ```
-Entry
-beforeTimers
+Entry ： 
+beforeTimers ： 
 beforeSources
 beforeWaiting
 afterWaiting
 exit
 ```
+
+#### Runloop 原理
+
+1. 通知 observers：RunLoop 要开始进入 loop 了，(<u>kCFRunLoopEntry</u>) 
+
+2. 开启一个 do while 来保活线程，通知 observers ：
+
+   - runloop 会触发 timers， source0 回调，(<u>kCFRunLoopBeforeTimers</u>  <u>kCFRunLoopBeforeSources</u>)
+   - 接着执行加入的 block
+   - 接下来触发 Source0 回调，如果有 Source1是 ready 状态的话，就会跳到 handle_msg 去处理消息，
+
+3. 通知 Observers：RunLoop 的线程将进入休眠（sleep）状态  （<u>kCFRunLoopBeforeWaiting</u>）
+
+4. 进入休眠后，会等待 mach_port的消息，以再次唤醒；只有在下面四个事件 
+
+   - 基于 port 的 source 事件
+   - timer 时间到
+   - runloop 超时
+   - 被调用者唤醒
+
+5. 唤醒时，通知 Observer: Runloop 的线程刚刚被唤醒了 （<u>kCFRunLoopAfterWaiting</u>）
+
+6. 被唤醒后，开始处理消息
+
+   - 如果是 Timer 时间到的话，就触发 Timer 的回调；
+
+   - 如果是 dispatch 的话，就执行 block；
+
+   - 如果是 source1 事件的话，就处理这个事件。
+
+     消息执行完后，就执行到loop里的block
+
+7. 根据当前runloop的状态来判断是否需要走下一个 loop。当被外部强制停止或loop 超时，就不继续下一个loop了，否则继续走下一个loop
 
 #### Runloop 的mode作用是什么
 
@@ -590,7 +623,7 @@ CPU资源紧张
 
 ### 读写安全
 
-atomic 读写加锁 danshi  release 不加锁
+atomic 读写加锁 但是  release 不加锁
 
 ### 多读单写
 
@@ -618,13 +651,75 @@ NSProxy 没有 init 方法
 
 如果调用 nsproxy 发送消息，他会直接调用
 
+
+
 ## 内存布局
 
+### 保留区 
 
+- 预留给系统处理nil等 
+- **`0x00400000`**开始
+
+### 代码段 
+
+- 编译之后的代码
+
+### 数据段 
+
+- 字符串变量 
+- 全局变量 
+- 静态变量
+
+### 堆
+
+- alloc
+
+``` 
+访问堆区内存时，一般是先通过对象读取到对象所在的栈区的指针地址，然后通过指针地址访问堆区
+```
+
+### 栈
+
+- 局部变量
+- 函数参数
+
+```
+内存从高到底分配 内存是连续的
+```
+
+### 内核区
+
+- 系统用来进行内核处理操作的区域
+
+**具体内存布局👇**
 
 <img src="https://tva1.sinaimg.cn/large/008eGmZEly1go88t2nr4rj31ig0totvh.jpg" style="zoom:67%;" />
 
-Tagged Pointer
+
+
+## 内存管理方案
+
+### ARC
+
+### MRC
+
+
+
+### Tagged Pointer
+
+- 小对象是不会进行retain和release操作的   因此不用担心过度释放问题
+
+- 专门用来`处理小对象`，例如NSNumber、NSDate、小NSString等
+
+- `NSTaggedPointerString类型`，存在`常量区`
+
+- 1.`NSTaggedPointerString`：标签指针，是苹果在`64位`环境下对`NSString、NSNumber`等对象做的`优化`。对于NSString对象来说
+- - 当`字符串是由数字、英文字母组合且长度小于等于9`时，会自动成为`NSTaggedPointerString`类型，存储在`常量区`
+  - 当有`中文或者其他特殊符号`时，会直接成为`__NSCFString`类型，存储在`堆区`
+- 2.`__NSCFString`：是在`运行时`创建的`NSString子类`，创建后`引用计数会加1`，`存储在堆上`
+- 3.`__NSCFConstantString`：`字符串常量`，是一种`编译时常量`，`retainCount值很大`，对其操作，`不会引起引用计数变化，存储在字符串常量区`
+
+
 
 ```
 从64bit开始，iOS引入了Tagged Pointer技术，用于优化NSNumber、NSDate、NSString等小对象的存储
@@ -647,19 +742,39 @@ pointer & 1
 Mac平台，最低有效位是1
 ```
 
-## 内存管理
 
 
+DEMO
+
+
+
+<img src="https://tva1.sinaimg.cn/large/008eGmZEly1goge7ptb12j30n10icjua.jpg" style="zoom:67%;" />
+
+崩溃原因是`多条线程`对`同一个对象`进行`释放`，导致`对象过度释放`，所以才会崩溃。
+
+### nonpointer_isa
+
+- 非指针类型的isa，主要是用来`优化64位地址`
+
+### SideTables
+
+- 散列表，在散列表中主要有`两个表`，分别是`引用计数表`、`弱引用表`
 
 ## 组件化
 
-### Beehive
+### ？Beehive
 
-### Bifrost
+### ？Bifrost
 
-## 设计模式
+### ？Aspect
 
-## 插件化
+### ?  fishhook
+
+### 
+
+## ？设计模式
+
+## ？插件化
 
 ## 算法
 
@@ -667,9 +782,30 @@ Mac平台，最低有效位是1
 
 ### 二叉树
 
+### ？二分查找
+
 ## 性能优化
 
-### 卡顿
+### 卡顿监测
+
+#### YYFPSLabel
+
+![](https://tva1.sinaimg.cn/large/008eGmZEly1goi1oedz0oj31ca0ridu5.jpg)
+
+
+
+#### Runloop 监测
+
+微信卡顿三方`matrix`
+
+创建一个 **CFRunLoopObserverContext** 观察者，将创建好的观察者 observer 添加到主线程runloop 的 common 模式下观察。然后创建一个持续的子线程专门用来监控主线程的runloop 状态。
+
+```objective-c
+CFRunLoopObserverContext context = {0,(__bridge void*)self,NULL,NULL};
+runLoopObserver = CFRunLoopObserverCreate(kCFAllocatorDefault,kCFRunLoopAllActivities,YES,0,&runLoopObserverCallBack,&context);
+```
+
+一旦发现进入休眠前的 beforeSources 状态，或者唤醒后的状态 afterWaiting ，在设置的时间内一直没有变化，即可判定为卡顿
 
 ### 离屏渲染
 
@@ -679,7 +815,7 @@ Mac平台，最低有效位是1
 
 ```
 1、需要创建新的缓冲区
-2、离屏渲染的过程中，需要多次切换上下文环境，先是从 当前屏幕切换到离屏；等到离屏渲染完毕后，将离屏缓冲区的渲染结果显示到屏幕上，又需要将上下文环境从离屏切换到当前屏幕
+2、离屏渲染的过程中，需要多次切换上下文环境，先是从当前屏幕切换到离屏；等到离屏渲染完毕后，将离屏缓冲区的渲染结果显示到屏幕上，又需要将上下文环境从离屏切换到当前屏幕
 ```
 
 离屏渲染产生的原因
@@ -691,32 +827,150 @@ Mac平台，最低有效位是1
 4、阴影 layer.shadowxxx  如果设置了 path 就不会触发离屏渲染
 ```
 
+### 渲染原理
+
+1、CPU 
+
+**计算要显示的内容，包括以下几个方面：**👇
+
+- 视图创建
+- 布局计算
+- 视图绘制
+- 图像解码
+
+```
+ 当 runloop 在 beforewaiting 和 exit 时通知注册的监听，然后对图层进行打包。然后将打包数据发给专门负责渲染的独立进程 render server
+```
+
+
+
+2、Render server
+
+- 图层树：反序列化后得到图层树
+- 渲染树：图层树转化后得到渲染树
+- GPU：渲染树通过 openGL接口提供给GPU，六大阶段
+
+### 界面优化
+
+##### CPU方面
+
+- tableview 提前计算cell 高度
+- 图片预解码 sdwebimage 创建上下文环境（CGBitmapContext），从 bitmap 直接得到图片
+- 文本的处理 coretext
+- 尽量避免使用透明 view 
+
+##### GPU 方面
+
+- 尽量`减少在短时间内大量图片的显示`
+- 图片纹理尺寸4096 *4096 （当图片超过这个尺寸时，会先由`CPU`进行预处理，然后再提交给`GPU`处理，导致额外`CPU`资源消耗）
+- 避免离屏渲染
+- 视图层级
+
 
 
 ### 冷启动
 
-dyld
+1. dyld
+2. 动态库加载
+3. runtime
+4. 加载分类
+5. main
 
-动态库加载
+## 源码
 
-runtime
+AFN
 
-加载分类
+https://juejin.cn/post/6939068933685116965
 
-main
+SD
+
+
 
 ## 面试
 
-隐式动画
+#### Flutter
 
-Tableview 复用原理
+1. flutter 是怎么渲染UI的
+2. Flutter 的视图结构的抽象分为三部分
 
-字节面试
+- widget   
+- element 
+- renderObject
 
-https://zhuanlan.zhihu.com/p/300978291
+```
+在渲染阶段，控件树（widget）会转换成对应的渲染对象（RenderObject）树，在 Rendering 层进行布局和绘制
+```
+
+2.Relayout Boundary
+
+```
+为了防止因子节点发生变化而导致的整个控件树重绘，Flutter 加入了一个机制 relayout boundry
+flutter使用边界标记需要重新绘制和重新布局的节点，这样就可以避免其他节点被污染或者触发重建。
+就是控件大小不会影响其他控件时，就没必要重新布局整个控件树。有了这个机制后，无论子树发生什么样的变化，处理范围都只在子树上。
+```
+
+3.布局的计算
+
+在布局时 Flutter 深度优先遍历**渲染对象树**。数据流的传递方式是从上到下传递约束，从下到上传递大小。也就是说，父节点会将自己的约束传递给子节点，子节点根据接收到的约束来计算自己的大小，然后将自己的尺寸返回给父节点。
 
 
 
-TCP和UDP区别，如何实现流量控制和拥塞控制
 
-https://juejin.cn/post/6936173181321347102
+
+### 什么是隐式动画
+
+显式动画是指用户自己通过beginAnimations:context:和commitAnimations创建的动画。CABasicAnimation
+
+隐式动画是指通过UIView的animateWithDuration:animations:方法创建的动画。
+
+隐式动画是ios4之后引入sdk的，之前只有显式动画。从官方的介绍来看，两者并没有什么差别，甚至苹果还推荐使用隐式动画，但是这里面有一个问题，就是使用隐式动画后，View会暂时不能接收用户的触摸、滑动等手势。这就造成了当一个列表滚动时，如果对其中的view使用了隐式动画，就会感觉滚动无法主动停止下来，必须等动画结束了才能停止。
+
+关键帧动画 CAKeyframeAnimation
+
+
+
+### ?Tableview 复用原理
+
+
+
+20210314 字节一面
+
+1. isEqual &&  hash
+
+   参考 https://www.jianshu.com/p/915356e280fc
+
+   ```
+   ==运算符 与 isEqual
+   ==运算符只是简单地判断是否是同一个对象, 而isEqual方法可以判断对象是否相同
+   ```
+
+   > hash方法只在对象被添加至NSSet和设置为NSDictionary的key时会调用
+
+2. 成员变量和 setter 方法
+
+3. hook 实例 例子： KVO 
+
+4. id  instancetype 
+
+   1. id 在编译时不能判断对象的真实类型  instancetype 可以判断
+   2. 如果init方法的返回值是instancetype,那么将返回值赋值给一个其它的对象会报一个警告
+   3. id可以用来定义变量, 可以作为返回值, 可以作为形参；instancetype只能用于作为返回值
+
+5. 内存布局
+
+6. tcp 和 UDP 
+
+   1. 基于连接与无连接；
+   2. 对系统资源的要求（TCP较多，UDP少）；
+   3. UDP程序结构较简单；
+   4. 流模式与数据报模式 ；
+   5. TCP保证数据正确性，UDP可能丢包，TCP保证数据顺序，UDP不保证。
+
+7. mvc 和 mvvm 
+
+8. git  rebase  git merge 区别
+
+   1. git pull  = git fetch + git merge 
+   2. git merge 与 git rebase 结果上没有本质区别 只是生成的节点不同 （rebase 一条线）
+
+9. 算法：全排列

@@ -9,6 +9,8 @@
 
 #import "Person.h"
 
+static int b = 10;
+
 @interface ViewController ()
 
 @end
@@ -21,10 +23,30 @@
 
     
 //    Person *p = [[[Person alloc] init] autorelease];
-    Person *p = [[Person alloc] init];
+//    Person *p = [[Person alloc] init];
+//
+//    NSLog(@"%s", __func__);
+    
+    Person *p = [Person alloc];
+    
+    NSLog(@"person alloc --- %p  %p", p, &p);
+    
+    NSString *str = @"123";
 
-    //    NSLog(@"%@", [NSRunLoop mainRunLoop]);
-    NSLog(@"%s", __func__);
+    NSString *str1 = [NSString stringWithFormat:@"123"];
+
+    NSLog(@"str --- %p  %p", str, &str);
+    
+    NSLog(@"str1 format ---%p  %p", str1, &str1);
+
+    NSLog(@"sel ---%p  %p", @selector(viewDidLoad), &@selector(viewDidLoad));
+
+    int a = 10;
+    
+    NSLog(@"inta --  %p", &a);
+    
+    NSLog(@"intb --  %p", &b);
+
 
 }
 
